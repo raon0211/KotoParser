@@ -3,3 +3,12 @@
 ################################################################################
 
 /Debug
+/ipch
+/KotoParser/Debug
+/KotoParser.Tests/Debug
+/.vs/KotoParser/v14
+/KotoParser/x64/Debug
+/KotoParser.Tests/x64/Debug
+/x64/Debug
+/KotoParser.VC.db
+/KotoParser.VC.VC.opendb
