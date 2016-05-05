@@ -9,8 +9,8 @@ namespace kotoparser
 {
 	wstring reverse(wstring input)
 	{
-		wstring result;
-		std::reverse_copy(input.begin(), input.end(), result.begin());
+		wstring result{ input };
+		std::reverse(result.begin(), result.end());
 
 		return result;
 	}
@@ -20,9 +20,9 @@ namespace kotoparser
 		return std::find_if(
 			str.begin(),
 			str.end(),
-			[](unsigned char ch)
+			[](wchar_t ch)
 			{
-				return !isspace(ch);
+				return !iswspace(ch);
 			})
 			== str.end();
 	}

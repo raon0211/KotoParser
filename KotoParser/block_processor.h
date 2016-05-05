@@ -26,10 +26,11 @@ namespace kotoparser
 		int check_indent();
 		bool make_code_block(shared_ptr<CodeBlock> block);
 		
-		vector<shared_ptr<Block>> integrate(vector<Block>& blocks);
-		void add_integrated_block(vector<Block>& result, vector<Block>& lines);
-		Block& make_blocks_from_lines(vector<Block>& lines);
-		vector<shared_ptr<Block>> set_list_level(vector<Block>& lines);
+		vector<shared_ptr<Block>> integrate(vector<shared_ptr<Block>> blocks);
+		void add_integrated_block(vector<shared_ptr<Block>>& result, vector<shared_ptr<Block>>& lines);
+		shared_ptr<Block> make_blocks_from_lines(vector<shared_ptr<Block>>& lines);
+		vector<shared_ptr<Block>> set_list_level(vector<shared_ptr<Block>>& lines);
+		void make_list_hierarchy(shared_ptr<ListBlock> list);
 	};
 }
 #endif

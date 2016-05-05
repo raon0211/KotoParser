@@ -13,7 +13,7 @@ namespace kotoparser
 
 		auto blocks = BlockProcessor(input).process();
 
-		for (shared_ptr<Block>block : blocks)
+		for (shared_ptr<Block> block : blocks)
 		{
 			result += block->render();
 		}

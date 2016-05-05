@@ -32,7 +32,8 @@ namespace kotoparser
 		Block& type(block_type new_type) { _type = new_type; return *this; }
 
 		vector<shared_ptr<Block>>& children() { return _children; }
-		
+		Block& children(vector<shared_ptr<Block>> new_children) { _children = new_children; return *this; }
+
 		wstring buffer() const { return _buffer; }
 		Block& buffer(wstring new_buffer) { _buffer = new_buffer; return *this; }
 
