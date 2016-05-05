@@ -6,11 +6,7 @@ using std::wstring;
 
 namespace kotoparser
 {
-	class KotoParser
-	{
-	public:
-		wstring transform(wstring input);
-	};
+	wstring transform(wstring input);
 }
 
 #endif

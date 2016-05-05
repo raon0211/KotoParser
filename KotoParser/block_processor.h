@@ -1,11 +1,14 @@
-#include <vector>
-#include "string_scanner.h"
-#include "block.h"
-
-using std::vector;
-
 #ifndef BLOCK_PROCESSOR_H
 #define BLOCK_PROCESSOR_H
+
+#include <vector>
+#include <memory>
+#include "string_scanner.h"
+#include "block.h"
+#include "blocks.h"
+
+using std::vector;
+using std::shared_ptr;
 
 namespace kotoparser
 {
@@ -15,17 +18,18 @@ namespace kotoparser
 		BlockProcessor(wstring input) : StringScanner(input) { }
 		BlockProcessor(wstring input, int start, int length) : StringScanner(input, start, length) { }
 	
-		vector<Block *> process();
+		vector<shared_ptr<Block>> process();
 	
 	private:
-		vector<Block *> parse();
-		vector<Block *> make_interspace_block();
+		vector<shared_ptr<Block>> parse();
+		vector<shared_ptr<Block>> make_interspace_block();
 		int check_indent();
+		bool make_code_block(shared_ptr<CodeBlock> block);
 		
-		vector<Block *> integrate(vector<Block>& blocks);
+		vector<shared_ptr<Block>> integrate(vector<Block>& blocks);
 		void add_integrated_block(vector<Block>& result, vector<Block>& lines);
 		Block& make_blocks_from_lines(vector<Block>& lines);
-		vector<Block *> set_list_level(vector<Block>& lines);
+		vector<shared_ptr<Block>> set_list_level(vector<Block>& lines);
 	};
 }
 #endif

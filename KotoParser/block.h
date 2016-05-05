@@ -3,10 +3,11 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 using std::vector;
-using std::reference_wrapper;
 using std::wstring;
+using std::shared_ptr;
 
 namespace kotoparser
 {
@@ -30,7 +31,7 @@ namespace kotoparser
 		block_type type() const { return _type; }
 		Block& type(block_type new_type) { _type = new_type; return *this; }
 
-		vector<reference_wrapper<Block>>& children() { return _children; }
+		vector<shared_ptr<Block>>& children() { return _children; }
 		
 		wstring buffer() const { return _buffer; }
 		Block& buffer(wstring new_buffer) { _buffer = new_buffer; return *this; }
@@ -51,12 +52,13 @@ namespace kotoparser
 		Block(wstring buffer)
 		{
 			_type = block_type::paragraph;
+			_buffer = buffer;
 		}
 
 		virtual wstring render();
 	protected:
 		block_type _type;
-		vector<reference_wrapper<Block>> _children;
+		vector<shared_ptr<Block>> _children;
 		wstring _buffer;
 		int _start;
 		int _length;

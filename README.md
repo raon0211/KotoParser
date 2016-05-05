@@ -16,12 +16,10 @@ Usage
 #include "kotoparser.h"
 
 using namespace std;
-using kotoparser::KotoParser
 
 int main(void)
 {
-    KotoParser parser;
-    cout << parser.transform(L"Hello, **markdown**");
+    cout << kotoparser::transform(L"Hello, **markdown**");
     // output: <p>Hello, <b>markdown</b></p>
     return 0;
 }

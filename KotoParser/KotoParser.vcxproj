@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block.cpp" />
+    <ClCompile Include="blocks.cpp" />
     <ClCompile Include="block_processor.cpp" />
     <ClCompile Include="kotoparser.cpp" />
     <ClCompile Include="utilities.cpp" />

@@ -7,13 +7,13 @@ using namespace std;
 
 namespace kotoparser
 {
-	wstring KotoParser::transform(wstring input)
+	wstring transform(wstring input)
 	{
 		wstring result;
 
 		auto blocks = BlockProcessor(input).process();
 
-		for (Block *block : blocks)
+		for (shared_ptr<Block>block : blocks)
 		{
 			result += block->render();
 		}

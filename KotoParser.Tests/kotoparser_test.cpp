@@ -3,7 +3,6 @@
 #include "kotoparser.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace kotoparser;
 
 namespace KotoParserTests
 {		
@@ -13,10 +12,23 @@ namespace KotoParserTests
 		
 		TEST_METHOD(HeadingTest)
 		{
-			KotoParser parser;
-			wstring result = parser.transform(L"# hello");
+			wstring result = kotoparser::transform(L"# hello");
 
-			Assert::AreEqual(result.c_str(), L"<h1>hello</h1>", L"Not same heading");
+			Assert::AreEqual(L"<h1>hello</h1>", result.c_str());
+		}
+
+		TEST_METHOD(BlockquoteTest)
+		{
+			wstring result = kotoparser::transform(L"> Blockquote");
+			
+			Assert::AreEqual(L"<blockquote>Blockquote</blockquote>", result.c_str());
+		}
+
+		TEST_METHOD(CodeTest)
+		{
+			wstring result = kotoparser::transform(L"```cpp\nhello\n```");
+
+			Assert::AreEqual(L"<pre><code class=\"cpp\">hello\n</code></pre>\n", result.c_str());
 		}
 	};
 }

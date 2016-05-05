@@ -1,3 +1,6 @@
+#ifndef BLOCKS_H
+#define BLOCKS_H
+
 #include "block.h"
 
 namespace kotoparser
@@ -14,17 +17,59 @@ namespace kotoparser
 			_level = level;
 		}
 
-		virtual wstring render()
-		{
-			wstring result;
-
-			result += L"<h" + std::to_wstring(_level) + L">";
-			result += content();
-			result += L"</h" + std::to_wstring(_level) + L">";
-
-			return result;
-		}
+		virtual wstring render();
 	private:
 		int _level;
 	};
+
+	class BlockquoteBlock : public Block
+	{
+	public:
+		BlockquoteBlock(wstring buffer) : Block(buffer)
+		{
+			_type = block_type::blockquote;
+		}
+
+		virtual wstring render();		
+	};
+
+	class CodeBlock : public Block
+	{
+	public:
+		wstring language() const { return _language; }
+		CodeBlock& language(wstring new_language) { _language = new_language; return *this; }
+
+		CodeBlock(wstring buffer) : Block(buffer)
+		{
+			_type = block_type::code;
+		}
+
+		virtual wstring render();
+	private:
+		wstring _language;
+	};
+
+	class PlainBlock : public Block
+	{
+	public:
+		PlainBlock(wstring buffer) : Block(buffer)
+		{
+			_type = block_type::plain;
+		}
+
+		virtual wstring render();
+	};
+
+	class BlankBlock : public Block
+	{
+	public:
+		BlankBlock(wstring buffer) : Block(buffer)
+		{
+			_type = block_type::blank;
+		}
+
+		virtual wstring render();
+	};
 }
+
+#endif

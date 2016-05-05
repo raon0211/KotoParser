@@ -19,11 +19,11 @@
     <Filter Include="헤더 파일\Infrastructure">
       <UniqueIdentifier>{2d0e8b5c-e4d7-4793-b749-cf8eef1a24b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Models">
-      <UniqueIdentifier>{2fc7897b-e3c3-44ea-b273-e8dd7e77cec5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="헤더 파일\Models">
       <UniqueIdentifier>{5e0d0bf4-6b05-4e09-b4ca-287abf6e83d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Models">
+      <UniqueIdentifier>{2fc7897b-e3c3-44ea-b273-e8dd7e77cec5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="kotoparser.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="blocks.cpp">
+      <Filter>소스 파일\Models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
