@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "blocks.h"
+#include "utilities.h"
 
 using std::reference_wrapper;
 using std::vector;
@@ -13,12 +14,12 @@ namespace kotoparser
 {
 	vector<shared_ptr<Block>> BlockProcessor::process()
 	{
-		// 일단 Block을 모두 파싱하고
+		// First, parse all blocks according to the line
 		vector<shared_ptr<Block>> blocks = parse();
 
-		// 이제 있는 Block은 줄별로 파싱되었으므로
-		// Paragraph - Paragraph - Blank - Paragraph - ListItem - ListItem - Heading 을
-		// Paragraph - Paragraph - List - Heading 으로 변환
+		// Now, the blocks are parsed by lines, so
+		// Transform Paragraph - Paragraph - Blank - Paragraph - ListItem - ListItem - Heading
+		// into Paragraph - Paragraph - List - Heading
 		blocks = integrate(blocks);
 
 		return blocks;
@@ -28,13 +29,14 @@ namespace kotoparser
 	{
 		vector<shared_ptr<Block>> blocks;
 
-		int start = position;
-
 		while (!at_file_end())
 		{
+			// We're starting at the first character of line
+			// or, in the case of definition lists, ':'
 			int line_start = position;
+			int indent = 0;
 
-			block_type last_block_type = blocks.size() > 0 ? blocks[blocks.size() - 1]->type() : block_type::blank;
+			BlockType last_block_type = blocks.size() > 0 ? blocks[blocks.size() - 1]->type() : BlockType::Blank;
 			shared_ptr<Block> block = NULL;
 
 			// # Heading
@@ -88,6 +90,7 @@ namespace kotoparser
 					position = line_start;
 				}
 			}
+			// ; Definition : List
 			else if (current() == ';' && is_line_end(char_at_offset(-1)))
 			{
 				skip_forward(1);
@@ -103,7 +106,20 @@ namespace kotoparser
 
 				block->end(position);
 			}
-			else if (current() == ':' && (last_block_type == block_type::term || last_block_type == block_type::definition))
+			// <html>
+			else if (current() == '<')
+			{
+				block.reset(new HtmlBlock(input));
+				block->start(position);
+
+				if (!make_html(std::dynamic_pointer_cast<HtmlBlock>(block)))
+				{
+					block = NULL;
+					position = line_start;
+				}
+			}
+			else if (indent = skip_linespace(),
+					 current() == ':' && (last_block_type == BlockType::Term || last_block_type == BlockType::Definition))
 			{
 				skip_forward(1);
 				skip_linespace();
@@ -118,6 +134,7 @@ namespace kotoparser
 
 				block->end(position);
 			}
+			// * Unordered List
 			else if ((current() == '*' || current() == '-' || current() == '+') && is_linespace(char_at_offset(1)) && char_is_first_of_line())
 			{
 				skip_forward(1);
@@ -130,6 +147,7 @@ namespace kotoparser
 
 				block->end(position);
 			}
+			// 1. Ordered List
 			else if (iswdigit(current()) && char_is_first_of_line())
 			{
 				do
@@ -146,23 +164,29 @@ namespace kotoparser
 					block->start(position);
 
 					skip_to_line_end();
-					
+
 					block->end(position);
 				}
 			}
-
-			if (block != NULL)
+			// Blank line
+			else if (at_line_end())
 			{
-				blocks.push_back(block);
-
-				skip_line_end();
-				start = position;
+				block.reset(new BlankBlock(input));
+				block->start(position);
+				block->end(position);
 			}
-			else
+		
+			if (block == NULL)
 			{
-				skip_forward(1);
-				skip_line_end();
+				block.reset(new ParagraphBlock(input));
+				block->start(position);
+				skip_to_line_end();
+				block->end(position);
 			}
+			
+			blocks.push_back(block);
+
+			skip_line_end();
 		}
 
 		return blocks;
@@ -218,7 +242,7 @@ namespace kotoparser
 			return false;
 		}
 
-		// 뒤에 잡다한 LineEnd 제거
+		// Remove unnecessary line ends
 		if (input[end - 1] == '\r' && input[end - 2] == '\n')
 		{
 			end -= 2;
@@ -242,6 +266,245 @@ namespace kotoparser
 		return true;
 	}
 
+	bool BlockProcessor::make_html(shared_ptr<HtmlBlock> block)
+	{
+		int start = position;
+
+		shared_ptr<HtmlTag> opening_tag = parse_tag();
+
+		if (opening_tag == NULL)
+		{
+			return false;
+		}
+
+		int content_start = position;
+
+		// Closing tag came first, wrong
+		if (opening_tag->closing())
+		{
+			return false;
+		}
+
+		// Is the opening tag safe?
+		bool safe = opening_tag->safe();
+
+		vector<HtmlTagType> types = opening_tag->types();
+
+		// If it is not a block element, it is not necessary to parse it
+		if (!contains(types, HtmlTagType::Block))
+		{
+			return false;
+		}
+
+		if (contains(types, HtmlTagType::NoClosing) ||
+			opening_tag->self_closed())
+		{
+			skip_linespace();
+			skip_line_end();
+
+			block->tag(opening_tag)
+				.end(position)
+				.type(safe ? BlockType::Html : BlockType::Plain);
+		}
+
+		if (contains(types, HtmlTagType::Inline))
+		{
+			skip_linespace();
+			if (!at_line_end())
+			{
+				return false;
+			}
+		}
+
+		vector<shared_ptr<Block>> child_blocks;
+
+		int depth = 1;
+
+		while (!at_file_end())
+		{
+			// Failed to find <, stop
+			if (!find('<'))
+			{
+				break;
+			}
+
+			int current_tag_start = position;
+
+			shared_ptr<HtmlTag> tag = parse_tag();
+			if (tag == NULL)
+			{
+				skip_forward(1);
+				continue;
+			}
+
+			if (tag->self_closed())
+			{
+				continue;
+			}
+
+			if (tag->name() == opening_tag->name())
+			{
+				if (tag->closing())
+				{
+					depth--;
+
+					if (depth == 0)
+					{
+						skip_linespace();
+						
+						block->tag(opening_tag);
+						block->end(position);
+
+						BlockProcessor processor(input, content_start, current_tag_start - content_start);
+						block->children(processor.process());
+
+						return true;
+					}
+				}
+				else
+				{
+					depth++;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	shared_ptr<HtmlTag> BlockProcessor::parse_tag()
+	{
+		int start = position;
+
+		if (current() != '<')
+		{
+			return NULL;
+		}
+
+		// skip '<'
+		skip_forward(1);
+
+		if (does_match(L"!--"))
+		{
+			skip_forward(3);
+
+			mark();
+
+			if (find(L"-->"))
+			{
+				HtmlTag t(L"!");
+				t.attributes()[L"content"] = extract();
+				t.self_closed(true);
+
+				skip_forward(3);
+			}
+		}
+
+		bool closing = false;
+
+		if (current() == '/')
+		{
+			closing = true;
+			skip_forward(1);
+		}
+
+		wstring name = extract_word_block();
+		if (is_null_or_whitespace(name))
+		{
+			return NULL;
+		}
+
+		shared_ptr<HtmlTag> tag{ new HtmlTag(name) };
+		tag->closing(closing);
+
+		if (closing)
+		{
+			// There is an attribute in a closing tag!
+			if (current() != '>')
+			{
+				return NULL;
+			}
+
+			skip_forward(1);
+			return tag;
+		}
+
+		while (!at_file_end())
+		{
+			skip_whitespace();
+
+			if (does_match(L"/>"))
+			{
+				tag->self_closed(true);
+				skip_forward(2);
+				return tag;
+			}
+
+			if (does_match(L">"))
+			{
+				skip_forward(1);
+				return tag;
+			}
+
+			wstring attribute_name = extract_word_block();
+			if (is_null_or_whitespace(attribute_name))
+			{
+				return NULL;
+			}
+
+			skip_whitespace();
+
+			// check if the attribute has value, like src=""
+			// or doesn't have a value, like autofocus
+			bool has_value = does_match('=');
+
+			if (has_value)
+			{
+				skip_forward(1);
+				skip_whitespace();
+
+				bool has_quote = does_match('"') || does_match(L"'");
+
+				if (has_quote)
+				{
+					wchar_t quote = current();
+
+					skip_forward(1);
+					mark();
+
+					if (!find(quote))
+					{
+						return NULL;
+					}
+
+					tag->attributes()[attribute_name] = extract();
+
+					skip_forward(1);
+				}
+				else
+				{
+					mark();
+
+					while (!at_file_end() &&
+						!(is_linespace(current()) || current() == '>' || current() == '/'))
+					{
+						skip_forward(1);
+					}
+
+					if (!at_file_end())
+					{
+						tag->attributes()[attribute_name] = extract();
+					}
+				}
+			}
+			else
+			{
+				tag->attributes()[attribute_name] = L"";
+			}
+		}
+
+		return NULL;
+	}
+
 	int BlockProcessor::check_indent()
 	{
 		int indent = 0;
@@ -262,7 +525,7 @@ namespace kotoparser
 
 			skip_forward(-1);
 		}
-		
+
 		position = start;
 		return indent;
 	}
@@ -275,68 +538,68 @@ namespace kotoparser
 
 		for (shared_ptr<Block> block : blocks)
 		{
-			block_type lines_type = lines.size() > 0 ? lines[0]->type() : block_type::blank;
+			BlockType lines_type = lines.size() > 0 ? lines[0]->type() : BlockType::Blank;
 
 			switch (block->type())
 			{
-			case block_type::blank:
-				add_integrated_block(result, lines);
-				break;
-
-			case block_type::paragraph:
-				if (lines_type == block_type::blank ||
-					lines_type == block_type::paragraph ||
-					lines_type == block_type::blockquote ||
-					lines_type == block_type::list_item)
-				{
-					lines.push_back(block);
+				case BlockType::Blank:
+					add_integrated_block(result, lines);
 					break;
-				}
 
-				add_integrated_block(result, lines);
-				lines.push_back(block);
-				break;
-
-			case block_type::list_item:
-				if (lines_type == block_type::blank)
-				{
-					lines.push_back(block);
-					break;
-				}
-				else if (lines_type == block_type::list_item)
-				{
-					auto first = std::dynamic_pointer_cast<ListItemBlock>(lines[0]);
-					auto current = std::dynamic_pointer_cast<ListItemBlock>(block);
-
-					if (first->is_ordered() == current->is_ordered())
+				case BlockType::Paragraph:
+					if (lines_type == BlockType::Blank ||
+						lines_type == BlockType::Paragraph ||
+						lines_type == BlockType::Blockquote ||
+						lines_type == BlockType::ListItem)
 					{
 						lines.push_back(block);
 						break;
 					}
-				}
 
-				add_integrated_block(result, lines);
-				lines.push_back(block);
-				break;
-
-			case block_type::term:
-			case block_type::definition:
-				if (lines_type == block_type::blank ||
-					lines_type == block_type::term ||
-					lines_type == block_type::definition)
-				{
+					add_integrated_block(result, lines);
 					lines.push_back(block);
 					break;
-				}
 
-				add_integrated_block(result, lines);
-				lines.push_back(block);
-				break;
+				case BlockType::ListItem:
+					if (lines_type == BlockType::Blank)
+					{
+						lines.push_back(block);
+						break;
+					}
+					else if (lines_type == BlockType::ListItem)
+					{
+						auto first = std::dynamic_pointer_cast<ListItemBlock>(lines[0]);
+						auto current = std::dynamic_pointer_cast<ListItemBlock>(block);
 
-			default:
-				add_integrated_block(result, lines);
-				result.push_back(block);
-				break;
+						if (first->is_ordered() == current->is_ordered())
+						{
+							lines.push_back(block);
+							break;
+						}
+					}
+
+					add_integrated_block(result, lines);
+					lines.push_back(block);
+					break;
+
+				case BlockType::Term:
+				case BlockType::Definition:
+					if (lines_type == BlockType::Blank ||
+						lines_type == BlockType::Term ||
+						lines_type == BlockType::Definition)
+					{
+						lines.push_back(block);
+						break;
+					}
+
+					add_integrated_block(result, lines);
+					lines.push_back(block);
+					break;
+
+				default:
+					add_integrated_block(result, lines);
+					result.push_back(block);
+					break;
 			}
 		}
 
@@ -364,44 +627,44 @@ namespace kotoparser
 
 		switch (lines[0]->type())
 		{
-		case block_type::paragraph:
-		{
-			shared_ptr<ParagraphBlock> p{ new ParagraphBlock(lines[0]->buffer()) };
-			p->start(lines[0]->start()).end(lines[lines.size() - 1]->end());;
-
-			lines.clear();
-
-			return p;
-		}
-
-		case block_type::list_item:
-		{
-			shared_ptr<ListBlock> list{ new ListBlock(lines[0]->buffer()) };
-			list->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
-			list->children(set_list_level(lines));
-
-			make_list_hierarchy(list);
-
-			lines.clear();
-
-			return list;
-		}
-		
-		case block_type::term:
-		case block_type::definition:
-		{
-			shared_ptr<DefinitionListBlock> def{ new DefinitionListBlock(lines[0]->buffer()) };
-			def->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
-
-			for (auto block : lines)
+			case BlockType::Paragraph:
 			{
-				def->children().push_back(block);
+				shared_ptr<ParagraphBlock> p{ new ParagraphBlock(lines[0]->buffer()) };
+				p->start(lines[0]->start()).end(lines[lines.size() - 1]->end());;
+
+				lines.clear();
+
+				return p;
 			}
 
-			lines.clear();
+			case BlockType::ListItem:
+			{
+				shared_ptr<ListBlock> list{ new ListBlock(lines[0]->buffer()) };
+				list->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
+				list->children(set_list_level(lines));
 
-			return def;
-		}
+				make_list_hierarchy(list);
+
+				lines.clear();
+
+				return list;
+			}
+
+			case BlockType::Term:
+			case BlockType::Definition:
+			{
+				shared_ptr<DefinitionListBlock> def{ new DefinitionListBlock(lines[0]->buffer()) };
+				def->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
+
+				for (auto block : lines)
+				{
+					def->children().push_back(block);
+				}
+
+				lines.clear();
+
+				return def;
+			}
 		}
 
 		return NULL;
@@ -415,7 +678,7 @@ namespace kotoparser
 		for (int i = 1; (unsigned)i < lines.size(); ++i)
 		{
 			// Compound if paragraph
-			if (lines[i]->type() == block_type::paragraph)
+			if (lines[i]->type() == BlockType::Paragraph)
 			{
 				lines[i - 1]->end(lines[i]->end());
 				lines.erase(lines.begin() + i);
@@ -445,7 +708,7 @@ namespace kotoparser
 				current->level(prev->level() + 1);
 			}
 		}
-		
+
 		return lines;
 	}
 
@@ -470,7 +733,9 @@ namespace kotoparser
 				if (children.size() > 0)
 				{
 					shared_ptr<ListBlock> child_list{ new ListBlock(list->buffer()) };
-					child_list->start(children[0]->start()).end(children[children.size() - 1]->end());
+					child_list
+						->start(children[0]->start())
+						.end(children[children.size() - 1]->end());
 
 					child_list->children(children);
 					make_list_hierarchy(child_list);

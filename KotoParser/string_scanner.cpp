@@ -20,19 +20,20 @@ namespace kotoparser
 		}
 	}
 	
-	// TODO: ±ú²ıÇÏ°Ô
 	bool StringScanner::char_is_first_of_line()
 	{
-		wstring reversed = kotoparser::reverse(input);
-		
-		int index = input.length() - position - 1;
-		std::wstring::iterator new_line_it = std::find_if(reversed.begin() + index, reversed.end(), [](wchar_t c) -> bool
-		{
-			return c == '\n' || c == '\r';
-		});
-		int new_line_index = std::distance(reversed.begin(), new_line_it);
+		int start = position;
 
-		return is_null_or_whitespace(reversed.substr(index + 1, new_line_index - index));
+		do
+		{
+			skip_forward(-1);
+		}
+		while (is_linespace(current()));
+
+		bool is_first_of_line = is_line_end(current());
+		position = start;
+
+		return is_first_of_line;
 	}
 
 	bool StringScanner::skipped_line_end()
@@ -132,20 +133,17 @@ namespace kotoparser
 		return true;
 	}
 
-	bool StringScanner::skip_linespace()
+	int StringScanner::skip_linespace()
 	{
-		if (!is_linespace(current()))
-		{
-			return false;
-		}
+		int indent = 0;
 
-		do
+		while (is_linespace(current()))
 		{
 			skip_forward(1);
+			indent++;
 		}
-		while (is_linespace(current()));
 
-		return true;
+		return indent;
 	}
 
 	void StringScanner::skip_to_line_end()

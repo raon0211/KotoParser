@@ -45,6 +45,9 @@
     <ClInclude Include="kotoparser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="html_tag.h">
+      <Filter>헤더 파일\Models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block_processor.cpp">
@@ -63,6 +66,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="blocks.cpp">
+      <Filter>소스 파일\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="html_tag.cpp">
       <Filter>소스 파일\Models</Filter>
     </ClCompile>
   </ItemGroup>

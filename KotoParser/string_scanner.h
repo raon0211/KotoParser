@@ -27,7 +27,7 @@ namespace kotoparser
 		wchar_t char_at_offset(int offset);
 		void skip_forward(int characters);
 		bool skip_whitespace();
-		bool skip_linespace();
+		int skip_linespace();
 		void skip_to_line_end();
 		void skip_line_end();
 		void skip_to_next_line();

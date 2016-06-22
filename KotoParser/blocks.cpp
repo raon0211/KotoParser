@@ -1,5 +1,6 @@
 #include "blocks.h"
 #include <string>
+#include "utilities.h"
 
 using std::wstring;
 
@@ -10,7 +11,7 @@ namespace kotoparser
 		wstring result;
 
 		result += L"<h" + std::to_wstring(_level) + L">";
-		result += content();
+		result += html_encode(content());
 		result += L"</h" + std::to_wstring(_level) + L">";
 
 		return result;
@@ -21,7 +22,7 @@ namespace kotoparser
 		wstring result;
 
 		result += L"<blockquote>";
-		result += content();
+		result += html_encode(content());
 		result += L"</blockquote>";
 
 		return result;
@@ -41,7 +42,7 @@ namespace kotoparser
 
 		for (auto line : children())
 		{
-			result += line->content();
+			result += html_encode(line->content());
 			result += '\n';
 		}
 		
@@ -56,7 +57,7 @@ namespace kotoparser
 		wstring result;
 
 		result += L"<dt>";
-		result += content();
+		result += html_encode(content());
 		result += L"</dt>";
 
 		result += L"\n";
@@ -86,7 +87,7 @@ namespace kotoparser
 		wstring result;
 
 		result += L"<dd>";
-		result += content();
+		result += html_encode(content());
 		result += L"</dd>";
 
 		result += L"\n";
@@ -132,7 +133,7 @@ namespace kotoparser
 
 		result += L"<li>";
 
-		result += content();
+		result += html_encode(content());
 
 		for (auto child : children())
 		{
@@ -151,8 +152,51 @@ namespace kotoparser
 		wstring result;
 
 		result += L"<p>";
-		result += content();
+		result += html_encode(content());
 		result += L"</p>";
+
+		result += L"\n";
+
+		return result;
+	}
+
+	wstring HtmlBlock::render()
+	{
+		wstring result;
+
+		wstring name = _wcslwr(&tag()->name()[0]);
+
+		result += L"<";
+		result += name;
+
+		for (auto attribute : tag()->attributes())
+		{
+			result += L" ";
+			result += attribute.first;
+			result += L"=";
+			result += '"';
+			result += attribute.second;
+			result += '"';
+		}
+
+		if (tag()->self_closed() ||
+			contains(tag()->types(), HtmlTagType::NoClosing))
+		{
+			result += L" />";
+		}
+		else
+		{
+			result += L">";
+
+			for (auto child : children())
+			{
+				result += child->render();
+			}
+
+			result += L"</";
+			result += name;
+			result += L">";
+		}
 
 		result += L"\n";
 
@@ -161,7 +205,7 @@ namespace kotoparser
 
 	wstring PlainBlock::render()
 	{
-		return content();
+		return html_encode(content());
 	}
 
 	wstring BlankBlock::render()

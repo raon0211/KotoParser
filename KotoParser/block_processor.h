@@ -25,6 +25,8 @@ namespace kotoparser
 		vector<shared_ptr<Block>> make_interspace_block();
 		int check_indent();
 		bool make_code_block(shared_ptr<CodeBlock> block);
+		bool make_html(shared_ptr<HtmlBlock> block);
+		shared_ptr<HtmlTag> parse_tag();
 		
 		vector<shared_ptr<Block>> integrate(vector<shared_ptr<Block>> blocks);
 		void add_integrated_block(vector<shared_ptr<Block>>& result, vector<shared_ptr<Block>>& lines);

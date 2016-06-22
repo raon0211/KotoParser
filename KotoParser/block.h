@@ -11,25 +11,25 @@ using std::shared_ptr;
 
 namespace kotoparser
 {
-	enum class block_type
+	enum class BlockType
 	{
-		blank,
-		heading,
-		blockquote,
-		code,
-		table,
-		html,
-		list, list_item,
-		definition_list, term, definition,
-		paragraph,
-		plain
+		Blank,
+		Heading,
+		Blockquote,
+		Code,
+		Table,
+		Html,
+		List, ListItem,
+		DefinitionList, Term, Definition,
+		Paragraph,
+		Plain
 	};
 
 	class Block
 	{
 	public:
-		block_type type() const { return _type; }
-		Block& type(block_type new_type) { _type = new_type; return *this; }
+		BlockType type() const { return _type; }
+		Block& type(BlockType new_type) { _type = new_type; return *this; }
 
 		vector<shared_ptr<Block>>& children() { return _children; }
 		Block& children(vector<shared_ptr<Block>> new_children) { _children = new_children; return *this; }
@@ -52,13 +52,13 @@ namespace kotoparser
 
 		Block(wstring buffer)
 		{
-			_type = block_type::paragraph;
+			_type = BlockType::Paragraph;
 			_buffer = buffer;
 		}
 
 		virtual wstring render();
 	protected:
-		block_type _type;
+		BlockType _type;
 		vector<shared_ptr<Block>> _children;
 		wstring _buffer;
 		int _start;

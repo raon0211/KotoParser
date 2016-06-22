@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "kotoparser.h"
+#include <map>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace std;
 
 namespace KotoParserTests
 {		
@@ -33,7 +35,13 @@ namespace KotoParserTests
 
 		TEST_METHOD(ListTest)
 		{
-			wstring result = kotoparser::transform(L"1. First\n * One\n * Two\n2. Second");
+			wstring input =
+L"1. First\n\
+ * One\n\
+ * Two\n\
+2. Second";
+
+			wstring result = kotoparser::transform(input);
 
 			Assert::AreEqual(L"<ol><li>First</li>\n</ol>\n<ul><li>One</li>\n<li>Two</li>\n</ul>\n<ol><li>Second</li>\n</ol>\n", result.c_str());
 		}
@@ -48,6 +56,24 @@ L"; term : definition\n\
 			wstring output = kotoparser::transform(input);
 
 			Assert::AreEqual(L"<dl><dt>term </dt>\n<dd>definition</dd>\n<dt>term 2</dt>\n<dd>definition 2</dd>\n</dl>\n", output.c_str());
+		}
+
+		TEST_METHOD(HtmlTest)
+		{
+			map<wstring, wstring> dic
+			{
+				{
+					L"<div class=\"wrap\">aa<div>aa</div></div>", L"<div class=\"wrap\">aa<div>aa</div></div>"
+				},
+				{ L"<h1><h2>dsdsds</h1></h2>", L"<h1><p>&lt;h2&gt;dsdsds</p>\n</h1>\n<p>&lt;/h2&gt;</p>\n" }
+			};
+
+			for (auto item : dic)
+			{
+				wstring output = kotoparser::transform(item.first);
+
+				Assert::AreEqual(item.second, output);
+			}
 		}
 	};
 }

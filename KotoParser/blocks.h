@@ -2,6 +2,7 @@
 #define BLOCKS_H
 
 #include "block.h"
+#include "html_tag.h"
 
 namespace kotoparser
 {
@@ -13,7 +14,7 @@ namespace kotoparser
 
 		HeadingBlock(wstring buffer, int level) : Block(buffer)
 		{
-			_type = block_type::heading;
+			_type = BlockType::Heading;
 			_level = level;
 		}
 
@@ -27,7 +28,7 @@ namespace kotoparser
 	public:
 		BlockquoteBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::blockquote;
+			_type = BlockType::Blockquote;
 		}
 
 		virtual wstring render();		
@@ -41,7 +42,7 @@ namespace kotoparser
 
 		CodeBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::code;
+			_type = BlockType::Code;
 		}
 
 		virtual wstring render();
@@ -54,7 +55,7 @@ namespace kotoparser
 	public:
 		DefinitionListBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::definition_list;
+			_type = BlockType::DefinitionList;
 		}
 
 		virtual wstring render();
@@ -65,7 +66,7 @@ namespace kotoparser
 	public:
 		TermBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::term;
+			_type = BlockType::Term;
 		}
 
 		virtual wstring render();
@@ -76,7 +77,7 @@ namespace kotoparser
 	public:
 		DefinitionBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::definition;
+			_type = BlockType::Definition;
 		}
 
 		virtual wstring render();
@@ -87,7 +88,7 @@ namespace kotoparser
 	public:
 		ListBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::list;
+			_type = BlockType::List;
 		}
 
 		virtual wstring render();
@@ -107,7 +108,7 @@ namespace kotoparser
 
 		ListItemBlock(wstring buffer, bool is_ordered, int indent) : Block(buffer)
 		{
-			_type = block_type::list_item;
+			_type = BlockType::ListItem;
 			_is_ordered = is_ordered;
 			_indent = indent;
 		}
@@ -125,10 +126,26 @@ namespace kotoparser
 	public:
 		ParagraphBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::paragraph;
+			_type = BlockType::Paragraph;
 		}
 
 		virtual wstring render();
+	};
+	
+	class HtmlBlock : public Block
+	{
+	public:
+		shared_ptr<HtmlTag> tag() const { return _tag; }
+		HtmlBlock& tag(shared_ptr<HtmlTag> new_tag) { _tag = new_tag; return *this; }
+
+		HtmlBlock(wstring buffer) : Block(buffer)
+		{
+			_type = BlockType::Html;
+		}
+
+		virtual wstring render();
+	private:
+		shared_ptr<HtmlTag> _tag;
 	};
 
 	class PlainBlock : public Block
@@ -136,7 +153,7 @@ namespace kotoparser
 	public:
 		PlainBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::plain;
+			_type = BlockType::Plain;
 		}
 
 		virtual wstring render();
@@ -147,7 +164,7 @@ namespace kotoparser
 	public:
 		BlankBlock(wstring buffer) : Block(buffer)
 		{
-			_type = block_type::blank;
+			_type = BlockType::Blank;
 		}
 
 		virtual wstring render();
