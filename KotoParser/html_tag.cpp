@@ -54,7 +54,7 @@ namespace kotoparser
 	{
 		wstring lower_name = _wcslwr(&name()[0]);
 		
-		if (std::find(allowed_tags.begin(), allowed_tags.end(), lower_name) == allowed_tags.end())
+		if (!contains(keys(tag_types_map), lower_name))
 		{
 			return false;
 		}
@@ -102,12 +102,5 @@ namespace kotoparser
 		}
 
 		return tag_types_map.at(name());
-	}
-
-	bool HtmlTag::is_safe_url(wstring url)
-	{
-		return str_starts_with(url, L"http://") ||
-			   str_starts_with(url, L"https://") ||
-			   str_starts_with(url, L"ftp://");
 	}
 }

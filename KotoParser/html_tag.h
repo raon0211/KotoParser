@@ -24,7 +24,7 @@ namespace kotoparser
 		wstring name() const { return _name; }
 		HtmlTag& name(wstring new_name) { _name = new_name; return *this; }
 
-		map<wstring, wstring> attributes() { return _attributes; }
+		map<wstring, wstring>& attributes() { return _attributes; }
 		HtmlTag& attributes(map<wstring, wstring> new_attributes) { _attributes = new_attributes; return *this; }
 
 		bool self_closed() const { return _self_closed; }
@@ -42,8 +42,6 @@ namespace kotoparser
 		}
 
 	private:
-		bool is_safe_url(wstring url);
-
 		wstring _name;
 		map<wstring, wstring> _attributes;
 		bool _self_closed;

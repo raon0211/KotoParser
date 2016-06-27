@@ -46,7 +46,8 @@ namespace kotoparser
 		int length() const { return _length; }
 		Block& length(int new_length) { _length = new_length; return *this; }
 
-		wstring content() const { 
+		wstring content() const 
+		{ 
 			return _buffer.substr(_start, _length);
 		};
 

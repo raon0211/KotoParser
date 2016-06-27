@@ -2,8 +2,10 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <map>
 
 using std::wstring;
+using std::map;
 
 namespace kotoparser
 {
@@ -15,7 +17,7 @@ namespace kotoparser
 		return result;
 	}
 
-	wstring html_encode(wstring& data)
+	wstring html_encode(wstring data)
 	{
 		wstring buffer;
 		buffer.reserve(data.size());
@@ -63,5 +65,12 @@ namespace kotoparser
 	bool str_starts_with(const wstring& input, const wstring& compare_str)
 	{
 		return input.compare(0, compare_str.length(), compare_str) == 0;
+	}
+
+	bool is_safe_url(wstring url)
+	{
+		return str_starts_with(url, L"http://") ||
+			str_starts_with(url, L"https://") ||
+			str_starts_with(url, L"ftp://");
 	}
 }

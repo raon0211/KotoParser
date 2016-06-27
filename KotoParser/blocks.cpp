@@ -1,6 +1,7 @@
 #include "blocks.h"
 #include <string>
 #include "utilities.h"
+#include "inline_processor.h"
 
 using std::wstring;
 
@@ -9,9 +10,10 @@ namespace kotoparser
 	wstring HeadingBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<h" + std::to_wstring(_level) + L">";
-		result += html_encode(content());
+		result += processor.transform();
 		result += L"</h" + std::to_wstring(_level) + L">";
 
 		return result;
@@ -20,9 +22,10 @@ namespace kotoparser
 	wstring BlockquoteBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<blockquote>";
-		result += html_encode(content());
+		result += processor.transform();
 		result += L"</blockquote>";
 
 		return result;
@@ -42,7 +45,9 @@ namespace kotoparser
 
 		for (auto line : children())
 		{
-			result += html_encode(line->content());
+			InlineProcessor processor(line->content());
+
+			result += processor.transform();
 			result += '\n';
 		}
 		
@@ -55,9 +60,10 @@ namespace kotoparser
 	wstring TermBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<dt>";
-		result += html_encode(content());
+		result += processor.transform();
 		result += L"</dt>";
 
 		result += L"\n";
@@ -85,9 +91,10 @@ namespace kotoparser
 	wstring DefinitionBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<dd>";
-		result += html_encode(content());
+		result += processor.transform();
 		result += L"</dd>";
 
 		result += L"\n";
@@ -130,10 +137,11 @@ namespace kotoparser
 	wstring ListItemBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<li>";
 
-		result += html_encode(content());
+		result += processor.transform();
 
 		for (auto child : children())
 		{
@@ -150,9 +158,10 @@ namespace kotoparser
 	wstring ParagraphBlock::render()
 	{
 		wstring result;
+		InlineProcessor processor(content());
 
 		result += L"<p>";
-		result += html_encode(content());
+		result += processor.transform();
 		result += L"</p>";
 
 		result += L"\n";

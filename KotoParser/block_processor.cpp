@@ -305,6 +305,8 @@ namespace kotoparser
 			block->tag(opening_tag)
 				.end(position)
 				.type(safe ? BlockType::Html : BlockType::Plain);
+
+			return true;
 		}
 
 		if (contains(types, HtmlTagType::Inline))

@@ -48,6 +48,15 @@
     <ClInclude Include="html_tag.h">
       <Filter>헤더 파일\Models</Filter>
     </ClInclude>
+    <ClInclude Include="token.h">
+      <Filter>헤더 파일\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="tokens.h">
+      <Filter>헤더 파일\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="inline_processor.h">
+      <Filter>헤더 파일\Infrastructure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block_processor.cpp">
@@ -70,6 +79,15 @@
     </ClCompile>
     <ClCompile Include="html_tag.cpp">
       <Filter>소스 파일\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="token.cpp">
+      <Filter>소스 파일\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="tokens.cpp">
+      <Filter>소스 파일\Models</Filter>
+    </ClCompile>
+    <ClCompile Include="inline_processor.cpp">
+      <Filter>소스 파일\Infrastructure</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

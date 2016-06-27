@@ -115,7 +115,10 @@
     <ClInclude Include="blocks.h" />
     <ClInclude Include="block_processor.h" />
     <ClInclude Include="html_tag.h" />
+    <ClInclude Include="inline_processor.h" />
     <ClInclude Include="kotoparser.h" />
+    <ClInclude Include="token.h" />
+    <ClInclude Include="tokens.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="string_scanner.h" />
   </ItemGroup>
@@ -124,7 +127,10 @@
     <ClCompile Include="blocks.cpp" />
     <ClCompile Include="block_processor.cpp" />
     <ClCompile Include="html_tag.cpp" />
+    <ClCompile Include="inline_processor.cpp" />
     <ClCompile Include="kotoparser.cpp" />
+    <ClCompile Include="token.cpp" />
+    <ClCompile Include="tokens.cpp" />
     <ClCompile Include="utilities.cpp" />
     <ClCompile Include="string_scanner.cpp" />
   </ItemGroup>
