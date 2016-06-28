@@ -2,7 +2,7 @@
 #include <vector>
 #include <map>
 
-using std::wstring;
+using std::string;
 using std::vector;
 using std::map;
 
@@ -11,9 +11,9 @@ using std::map;
 
 namespace kotoparser
 {
-	wstring reverse(wstring& input);
-	wstring html_encode(wstring input);
-	bool is_null_or_whitespace(const wstring& str);
+	string reverse(string& input);
+	string html_encode(string input);
+	bool is_null_or_whitespace(const string& str);
 
 	template <class C, class T>
 	int index_of(vector<C> vector, T element)
@@ -21,10 +21,10 @@ namespace kotoparser
 		return find(vector.begin(), vector.end(), element) - vector.begin();
 	}
 
-	int index_of_any(const wstring& input, vector<wchar_t> chars);
-	int index_of_any(const wstring& input, vector<wchar_t> chars, int index);
-	bool str_starts_with(const wstring& input, const wstring& compare_str);
-	bool is_safe_url(wstring url);
+	int index_of_any(const string& input, vector<char> chars);
+	int index_of_any(const string& input, vector<char> chars, int index);
+	bool str_starts_with(const string& input, const string& compare_str);
+	bool is_safe_url(string url);
 
 	template<class C, class T>
 	vector<C> keys(map<C, T> target)

@@ -2,11 +2,11 @@
 #define KOTOPARSER_H
 
 #include <string>
-using std::wstring;
+using std::string;
 
 namespace kotoparser
 {
-	wstring transform(wstring input);
+	string transform(string input);
 }
 
 #endif

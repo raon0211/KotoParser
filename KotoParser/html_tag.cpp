@@ -5,54 +5,54 @@ using std::pair;
 
 namespace kotoparser
 {
-	vector<wstring> HtmlTag::allowed_tags = {
-		L"b", L"blockquote", L"code", L"dd", L"dt", L"dl", L"del", L"em", L"h1", L"h2", L"h3", L"h4", L"h5", L"h6", L"i", L"kbd", L"li", L"ol", L"ul",
-		L"p", L"pre", L"s", L"sub", L"sup", L"strong", L"strike", L"img", L"a"
+	vector<string> HtmlTag::allowed_tags = {
+		"b", "blockquote", "code", "dd", "dt", "d", "de", "em", "h1", "h2", "h3", "h4", "h5", "h6", "i", "kbd", "li", "o", "u",
+		"p", "pre", "s", "sub", "sup", "strong", "strike", "img", "a"
 	};
 
-	map<wstring, vector<wstring>> HtmlTag::allowed_attribute_map = {
-		{ L"a", { L"href", L"title", L"class" } },
-		{ L"img", { L"src", L"width", L"height", L"alt", L"title", L"class" } },
-		{ L"div", { L"class" } }
+	map<string, vector<string>> HtmlTag::allowed_attribute_map = {
+		{ "a", { "href", "title", "class" } },
+		{ "img", { "src", "width", "height", "alt", "title", "class" } },
+		{ "div", { "class" } }
 	};
 
-	map<wstring, vector<HtmlTagType>> HtmlTag::tag_types_map = {
-		{ L"p", { HtmlTagType::Block } },
-		{ L"div", { HtmlTagType::Block } },
-		{ L"h1", { HtmlTagType::Block } },
-		{ L"h2", { HtmlTagType::Block } },
-		{ L"h3", { HtmlTagType::Block } },
-		{ L"h4", { HtmlTagType::Block } },
-		{ L"h5", { HtmlTagType::Block } },
-		{ L"h6", { HtmlTagType::Block } },
-		{ L"blockquote", { HtmlTagType::Block } },
-		{ L"pre", { HtmlTagType::Block } },
-		{ L"table", { HtmlTagType::Block } },
-		{ L"dl", { HtmlTagType::Block } },
-		{ L"ol", { HtmlTagType::Block } },
-		{ L"ul", { HtmlTagType::Block } },
-		{ L"li", { HtmlTagType::Block } },
-		{ L"dd", { HtmlTagType::Block } },
-		{ L"dt", { HtmlTagType::Block } },
-		{ L"td", { HtmlTagType::Block } },
-		{ L"th", { HtmlTagType::Block } },
-		{ L"form", { HtmlTagType::Block } },
-		{ L"fieldset", { HtmlTagType::Block } },
-		{ L"legend", { HtmlTagType::Block } },
-		{ L"address", { HtmlTagType::Block } },
-		{ L"hr", { HtmlTagType::Block, HtmlTagType::NoClosing } },
-		{ L"br", { HtmlTagType::NoClosing } },
-		{ L"math", { HtmlTagType::Block, HtmlTagType::Inline } },
-		{ L"ins", { HtmlTagType::Block, HtmlTagType::Inline } },
-		{ L"del", { HtmlTagType::Block, HtmlTagType::Inline } },
-		{ L"img", { HtmlTagType::Block, HtmlTagType::Inline } },
-		{ L"del", { HtmlTagType::Block, HtmlTagType::Inline } },
-		{ L"!", { HtmlTagType::Block } }
+	map<string, vector<HtmlTagType>> HtmlTag::tag_types_map = {
+		{ "p", { HtmlTagType::Block } },
+		{ "div", { HtmlTagType::Block } },
+		{ "h1", { HtmlTagType::Block } },
+		{ "h2", { HtmlTagType::Block } },
+		{ "h3", { HtmlTagType::Block } },
+		{ "h4", { HtmlTagType::Block } },
+		{ "h5", { HtmlTagType::Block } },
+		{ "h6", { HtmlTagType::Block } },
+		{ "blockquote", { HtmlTagType::Block } },
+		{ "pre", { HtmlTagType::Block } },
+		{ "table", { HtmlTagType::Block } },
+		{ "d", { HtmlTagType::Block } },
+		{ "o", { HtmlTagType::Block } },
+		{ "u", { HtmlTagType::Block } },
+		{ "li", { HtmlTagType::Block } },
+		{ "dd", { HtmlTagType::Block } },
+		{ "dt", { HtmlTagType::Block } },
+		{ "td", { HtmlTagType::Block } },
+		{ "th", { HtmlTagType::Block } },
+		{ "form", { HtmlTagType::Block } },
+		{ "fieldset", { HtmlTagType::Block } },
+		{ "legend", { HtmlTagType::Block } },
+		{ "address", { HtmlTagType::Block } },
+		{ "hr", { HtmlTagType::Block, HtmlTagType::NoClosing } },
+		{ "br", { HtmlTagType::NoClosing } },
+		{ "math", { HtmlTagType::Block, HtmlTagType::Inline } },
+		{ "ins", { HtmlTagType::Block, HtmlTagType::Inline } },
+		{ "de", { HtmlTagType::Block, HtmlTagType::Inline } },
+		{ "img", { HtmlTagType::Block, HtmlTagType::Inline } },
+		{ "de", { HtmlTagType::Block, HtmlTagType::Inline } },
+		{ "!", { HtmlTagType::Block } }
 	};
 
 	bool HtmlTag::safe()
 	{
-		wstring lower_name = _wcslwr(&name()[0]);
+		string lower_name = _strlwr(&name()[0]);
 		
 		if (!contains(keys(tag_types_map), lower_name))
 		{
@@ -60,31 +60,31 @@ namespace kotoparser
 		}
 
 		// If no attributes are allowed,
-		if (allowed_attribute_map.find(_wcslwr(&name()[0])) == allowed_attribute_map.end())
+		if (allowed_attribute_map.find(_strlwr(&name()[0])) == allowed_attribute_map.end())
 		{
 			// Having no attributes is safe
 			return attributes().size() == 0;
 		}
 
-		for (pair<wstring, wstring> attribute : attributes())
+		for (pair<string, string> attribute : attributes())
 		{
-			if (allowed_attribute_map.find(_wcslwr(&attribute.first[0])) == allowed_attribute_map.end())
+			if (allowed_attribute_map.find(_strlwr(&attribute.first[0])) == allowed_attribute_map.end())
 			{
 				return false;
 			}
 		}
 
-		if (attributes().find(L"href") != attributes().end())
+		if (attributes().find("href") != attributes().end())
 		{
-			if (!is_safe_url(attributes().at(L"href")))
+			if (!is_safe_url(attributes().at("href")))
 			{
 				return false;
 			}
 		}
 
-		if (attributes().find(L"src") != attributes().end())
+		if (attributes().find("src") != attributes().end())
 		{
-			if (!is_safe_url(attributes().at(L"src")))
+			if (!is_safe_url(attributes().at("src")))
 			{
 				return false;
 			}
@@ -95,7 +95,7 @@ namespace kotoparser
 
 	vector<HtmlTagType> HtmlTag::types()
 	{
-		if (tag_types_map.find(_wcslwr(&name()[0])) == tag_types_map.end())
+		if (tag_types_map.find(_strlwr(&name()[0])) == tag_types_map.end())
 		{
 			vector<HtmlTagType> types = { HtmlTagType::Inline };
 			return types;

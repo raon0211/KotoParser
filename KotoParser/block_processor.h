@@ -15,8 +15,8 @@ namespace kotoparser
 	class BlockProcessor : public StringScanner
 	{
 	public:
-		BlockProcessor(wstring input) : StringScanner(input) { }
-		BlockProcessor(wstring input, int start, int length) : StringScanner(input, start, length) { }
+		BlockProcessor(string input) : StringScanner(input) { }
+		BlockProcessor(string input, int start, int length) : StringScanner(input, start, length) { }
 	
 		vector<shared_ptr<Block>> process();
 	

@@ -3,7 +3,7 @@
 
 #include <string>
 
-using std::wstring;
+using std::string;
 
 namespace kotoparser
 {
@@ -23,8 +23,8 @@ namespace kotoparser
 		TokenType type() const { return _type; }
 		Token& type(TokenType new_type) { _type = new_type; return *this; }
 		
-		wstring buffer() const { return _buffer; }
-		Token& buffer(wstring new_buffer) { _buffer = new_buffer; return *this; }
+		string buffer() const { return _buffer; }
+		Token& buffer(string new_buffer) { _buffer = new_buffer; return *this; }
 
 		int start() const { return _start; }
 		Token& start(int new_start) { _start = new_start; return *this; }
@@ -35,28 +35,28 @@ namespace kotoparser
 		int length() const { return _length; }
 		Token& length(int new_length) { _length = new_length; return *this; }
 
-		wstring content() const
+		string content() const
 		{
 			return _buffer.substr(_start, _length);
 		}
 
-		Token(wstring buffer)
+		Token(string buffer)
 		{
 			_buffer = buffer;
 		}
 
-		Token(wstring buffer, int start, int length)
+		Token(string buffer, int start, int length)
 		{
 			_buffer = buffer;
 			_start = start;
 			_length = length;
 		}
 
-		virtual wstring render();
+		virtual string render();
 
 	protected:
 		TokenType _type;
-		wstring _buffer;
+		string _buffer;
 		int _start;
 		int _length;
 	};

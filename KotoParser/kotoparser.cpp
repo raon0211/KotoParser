@@ -7,9 +7,9 @@ using namespace std;
 
 namespace kotoparser
 {
-	wstring transform(wstring input)
+	string transform(string input)
 	{
-		wstring result;
+		string result;
 
 		auto blocks = BlockProcessor(input).process();
 

@@ -4,11 +4,11 @@
 #include <vector>
 #include "utilities.h"
 
-using std::wstring;
+using std::string;
 
 namespace kotoparser
 {
-	wchar_t StringScanner::current()
+	char StringScanner::current()
 	{
 		if (position < start || position >= end)
 		{
@@ -56,22 +56,22 @@ namespace kotoparser
 		return is_line_end(current());
 	}
 
-	StringScanner::StringScanner(wstring input)
+	StringScanner::StringScanner(string input)
 	{
 		reset(input);
 	}
 
-	StringScanner::StringScanner(wstring input, int position, int length)
+	StringScanner::StringScanner(string input, int position, int length)
 	{
 		reset(input, position, length);
 	}
 
-	void StringScanner::reset(wstring input)
+	void StringScanner::reset(string input)
 	{
 		reset(input, 0, input.length());
 	}
 
-	void StringScanner::reset(wstring input, int position, int length)
+	void StringScanner::reset(string input, int position, int length)
 	{
 		if (position < 0)
 		{
@@ -100,7 +100,7 @@ namespace kotoparser
 		}
 	}
 
-	wchar_t StringScanner::char_at_offset(int offset)
+	char StringScanner::char_at_offset(int offset)
 	{
 		int index = position + offset;
 
@@ -150,7 +150,7 @@ namespace kotoparser
 	{
 		while (position < end)
 		{
-			wchar_t c = input[position];
+			char c = input[position];
 
 			if (c == '\r' || c == '\n')
 			{
@@ -165,7 +165,7 @@ namespace kotoparser
 	{
 		if (position < end)
 		{
-			wchar_t c = input[position];
+			char c = input[position];
 
 			if (c == '\r')
 			{
@@ -195,14 +195,14 @@ namespace kotoparser
 		position = end;
 	}
 
-	bool StringScanner::does_match(wchar_t c)
+	bool StringScanner::does_match(char c)
 	{
 		return current() == c;
 	}
 
-	bool StringScanner::does_match_any(vector<wchar_t> chars)
+	bool StringScanner::does_match_any(vector<char> chars)
 	{
-		for (wchar_t c : chars)
+		for (char c : chars)
 		{
 			if (does_match(c))
 			{
@@ -213,7 +213,7 @@ namespace kotoparser
 		return false;
 	}
 
-	bool StringScanner::does_match(wstring str)
+	bool StringScanner::does_match(string str)
 	{
 		for (int i = 0; (unsigned)i < str.length(); ++i)
 		{
@@ -226,15 +226,15 @@ namespace kotoparser
 		return true;
 	}
 
-	bool StringScanner::find(wchar_t c)
+	bool StringScanner::find(char c)
 	{
 		if (position > end)
 		{
 			return false;
 		}
 
-		wstring::size_type index = input.find(c, position);
-		if (index == wstring::npos || index >= (unsigned)end)
+		string::size_type index = input.find(c, position);
+		if (index == string::npos || index >= (unsigned)end)
 		{
 			return false;
 		}
@@ -243,7 +243,7 @@ namespace kotoparser
 		return true;
 	}
 
-	bool StringScanner::find_any(vector<wchar_t> chars)
+	bool StringScanner::find_any(vector<char> chars)
 	{
 		int index = index_of_any(input, chars, position);
 
@@ -256,10 +256,10 @@ namespace kotoparser
 		return true;
 	}
 
-	bool StringScanner::find(wstring str)
+	bool StringScanner::find(string str)
 	{
-		wstring::size_type index = input.find(str, position);
-		if (index == wstring::npos || index >= (unsigned)end)
+		string::size_type index = input.find(str, position);
+		if (index == string::npos || index >= (unsigned)end)
 		{
 			return false;
 		}
@@ -268,12 +268,12 @@ namespace kotoparser
 		return true;
 	}
 
-	wstring StringScanner::substring(int start)
+	string StringScanner::substring(int start)
 	{
 		return input.substr(start, end - start);
 	}
 
-	wstring StringScanner::substring(int start, int length)
+	string StringScanner::substring(int start, int length)
 	{
 		if (start + length > end)
 		{
@@ -288,17 +288,17 @@ namespace kotoparser
 		mark_pos = position;
 	}
 
-	wstring StringScanner::extract()
+	string StringScanner::extract()
 	{
 		if (mark_pos >= position)
 		{
-			return L"";
+			return "";
 		}
 
 		return input.substr(mark_pos, position - mark_pos);
 	}
 
-	wstring StringScanner::extract_word_block()
+	string StringScanner::extract_word_block()
 	{
 		mark();
 
@@ -314,12 +314,12 @@ namespace kotoparser
 		return extract();
 	}
 
-	bool is_linespace(wchar_t c)
+	bool is_linespace(char c)
 	{
 		return c == ' ' || c == '\t';
 	}
 
-	bool is_line_end(wchar_t c)
+	bool is_line_end(char c)
 	{
 		return c == '\r' || c == '\n' || c == '\0';
 	}

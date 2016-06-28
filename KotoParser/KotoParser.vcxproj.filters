@@ -57,6 +57,9 @@
     <ClInclude Include="inline_processor.h">
       <Filter>헤더 파일\Infrastructure</Filter>
     </ClInclude>
+    <ClInclude Include="table_processor.h">
+      <Filter>헤더 파일\Infrastructure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="block_processor.cpp">
@@ -87,6 +90,9 @@
       <Filter>소스 파일\Models</Filter>
     </ClCompile>
     <ClCompile Include="inline_processor.cpp">
+      <Filter>소스 파일\Infrastructure</Filter>
+    </ClCompile>
+    <ClCompile Include="table_processor.cpp">
       <Filter>소스 파일\Infrastructure</Filter>
     </ClCompile>
   </ItemGroup>

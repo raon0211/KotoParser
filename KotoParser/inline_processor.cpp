@@ -9,11 +9,11 @@ using std::array;
 
 namespace kotoparser
 {
-	wstring InlineProcessor::transform()
+	string InlineProcessor::transform()
 	{
 		vector<shared_ptr<Token>> tokens = process();
 
-		wstring result;
+		string result;
 
 		for (shared_ptr<Token> token : tokens)
 		{
@@ -108,7 +108,7 @@ namespace kotoparser
 
 	shared_ptr<Token> InlineProcessor::make_emphasis_token()
 	{
-		wchar_t c = current();
+		char c = current();
 
 		int start = position;
 
@@ -172,7 +172,7 @@ namespace kotoparser
 		return shared_ptr<EmphasisParseToken>(new EmphasisParseToken(input, start, 1, EmphasisType::Internal));
 	}
 
-	bool InlineProcessor::is_emphasis_char(wchar_t c)
+	bool InlineProcessor::is_emphasis_char(char c)
 	{
 		return c == '*' || c == '_';
 	}
@@ -358,16 +358,16 @@ namespace kotoparser
 		// skip '<'
 		skip_forward(1);
 
-		if (does_match(L"!--"))
+		if (does_match("!--"))
 		{
 			skip_forward(3);
 
 			mark();
 
-			if (find(L"-->"))
+			if (find("-->"))
 			{
-				HtmlTag t(L"!");
-				t.attributes()[L"content"] = extract();
+				HtmlTag t("!");
+				t.attributes()["content"] = extract();
 				t.self_closed(true);
 
 				skip_forward(3);
@@ -382,7 +382,7 @@ namespace kotoparser
 			skip_forward(1);
 		}
 
-		wstring name = extract_word_block();
+		string name = extract_word_block();
 		if (is_null_or_whitespace(name))
 		{
 			return NULL;
@@ -407,20 +407,20 @@ namespace kotoparser
 		{
 			skip_whitespace();
 
-			if (does_match(L"/>"))
+			if (does_match("/>"))
 			{
 				tag->self_closed(true);
 				skip_forward(2);
 				return tag;
 			}
 
-			if (does_match(L">"))
+			if (does_match(">"))
 			{
 				skip_forward(1);
 				return tag;
 			}
 
-			wstring attribute_name = extract_word_block();
+			string attribute_name = extract_word_block();
 			if (is_null_or_whitespace(attribute_name))
 			{
 				return NULL;
@@ -437,11 +437,11 @@ namespace kotoparser
 				skip_forward(1);
 				skip_whitespace();
 
-				bool has_quote = does_match('"') || does_match(L"'");
+				bool has_quote = does_match('"') || does_match("'");
 
 				if (has_quote)
 				{
-					wchar_t quote = current();
+					char quote = current();
 
 					skip_forward(1);
 					mark();
@@ -473,7 +473,7 @@ namespace kotoparser
 			}
 			else
 			{
-				tag->attributes()[attribute_name] = L"";
+				tag->attributes()[attribute_name] = "";
 			}
 		}
 
@@ -522,7 +522,7 @@ namespace kotoparser
 		}
 
 		// first extract without last ']'
-		wstring link_text = extract();
+		string link_text = extract();
 
 		// and then skip last ']'
 		skip_forward(1);
@@ -568,7 +568,7 @@ namespace kotoparser
 				}
 
 				// first extract without trailing last ')'
-				wstring link_url = extract();
+				string link_url = extract();
 
 				// and then skip last ')'
 				skip_forward(1);

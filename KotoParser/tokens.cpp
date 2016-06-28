@@ -3,54 +3,54 @@
 
 namespace kotoparser
 {
-	wstring EmphasisToken::render()
+	string EmphasisToken::render()
 	{
-		wstring result;
+		string result;
 
-		wstring name = is_strong() ? L"strong" : L"em";
+		string name = is_strong() ? "strong" : "em";
 
-		result += L"<" + name + L">";
+		result += "<" + name + ">";
 
 		for (auto token : children())
 		{
 			result += token->render();
 		}
 
-		result += L"</" + name + L">";
+		result += "</" + name + ">";
 
 		return result;
 	}
 
-	wstring EmphasisParseToken::render()
+	string EmphasisParseToken::render()
 	{
 		return html_encode(content());
 	}
 
-	wstring CodeToken::render()
+	string CodeToken::render()
 	{
-		wstring result;
+		string result;
 
-		result += L"<code>";
+		result += "<code>";
 		result += html_encode(content());
-		result += L"</code>";
+		result += "</code>";
 
 		return result;
 	}
 
-	wstring HtmlToken::render()
+	string HtmlToken::render()
 	{
-		wstring result;
+		string result;
 
-		wstring name = _wcslwr(&tag()->name()[0]);
+		string name = _strlwr(&tag()->name()[0]);
 
-		result += L"<";
+		result += "<";
 		result += name;
 
 		for (auto attribute : tag()->attributes())
 		{
-			result += L" ";
+			result += " ";
 			result += attribute.first;
-			result += L"=";
+			result += "=";
 			result += '"';
 			result += attribute.second;
 			result += '"';
@@ -59,77 +59,77 @@ namespace kotoparser
 		if (tag()->self_closed() ||
 			contains(tag()->types(), HtmlTagType::NoClosing))
 		{
-			result += L" />";
+			result += " />";
 		}
 		else
 		{
-			result += L">";
+			result += ">";
 
 			for (auto child : children())
 			{
 				result += child->render();
 			}
 
-			result += L"</";
+			result += "</";
 			result += name;
-			result += L">";
+			result += ">";
 		}
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring LinkToken::render()
+	string LinkToken::render()
 	{
-		wstring result;
+		string result;
 
-		result += L"<a";
+		result += "<a";
 
-		result += L" href=\"";
+		result += " href=\"";
 		result += url();
-		result += L"\"";
+		result += "\"";
 
-		result += L" class=\"";
-		result += is_internal() ? L"internal" : L"external";
-		result += L"\"";
+		result += " class=\"";
+		result += is_internal() ? "internal" : "external";
+		result += "\"";
 
-		result += L">";
+		result += ">";
 
 		result += html_encode(text());
 
-		result += L"</a>";
+		result += "</a>";
 
 		return result;
 	}
 
-	wstring ImageToken::render()
+	string ImageToken::render()
 	{
-		wstring result;
+		string result;
 
-		result += L"<img";
+		result += "<img";
 
-		result += L" src=\"";
+		result += " src=\"";
 		result += url();
-		result += L"\"";
+		result += "\"";
 
 		if (!is_null_or_whitespace(text()))
 		{
-			result += L" alt=\"";
+			result += " alt=\"";
 			result += html_encode(text());
-			result += L"\"";
+			result += "\"";
 
-			result += L" title=\"";
+			result += " title=\"";
 			result += html_encode(text());
-			result += L"\"";
+			result += "\"";
 		}
 
-		result += L" />";
+		result += " />";
 
 		return result;
 	}
 
-	wstring TextToken::render()
+	string TextToken::render()
 	{
 		return html_encode(content());
 	}

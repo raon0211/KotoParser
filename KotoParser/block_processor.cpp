@@ -4,10 +4,11 @@
 #include <memory>
 #include "blocks.h"
 #include "utilities.h"
+#include "table_processor.h"
 
 using std::reference_wrapper;
 using std::vector;
-using std::wstring;
+using std::string;
 using std::shared_ptr;
 
 namespace kotoparser
@@ -118,6 +119,30 @@ namespace kotoparser
 					position = line_start;
 				}
 			}
+			else if (current() == '|' || current() == '^')
+			{
+				block.reset(new TableRowBlock(input));
+				block->start(position);
+
+				skip_to_line_end();
+
+				if (char_at_offset(-1) == '|' ||
+					char_at_offset(-1) == '^')
+				{
+					block->end(position);
+
+					string row_content = block->content();
+					// remove the trailing '^' or '|'
+					TableProcessor processor(row_content, 0, row_content.length() - 1);
+
+					block->children(processor.process());
+				}
+				else
+				{
+					block = NULL;
+					position = line_start;
+				}
+			}
 			else if (indent = skip_linespace(),
 					 current() == ':' && (last_block_type == BlockType::Term || last_block_type == BlockType::Definition))
 			{
@@ -194,7 +219,7 @@ namespace kotoparser
 
 	bool BlockProcessor::make_code_block(shared_ptr<CodeBlock> block)
 	{
-		wchar_t delim = current();
+		char delim = current();
 
 		// Check if there are three `s
 		mark();
@@ -204,7 +229,7 @@ namespace kotoparser
 			skip_forward(1);
 		}
 
-		wstring fence = extract();
+		string fence = extract();
 
 		if (fence.length() < 3)
 		{
@@ -218,7 +243,7 @@ namespace kotoparser
 		{
 			mark();
 			skip_to_line_end();
-			wstring language = extract();
+			string language = extract();
 
 			block->language(language);
 		}
@@ -385,16 +410,16 @@ namespace kotoparser
 		// skip '<'
 		skip_forward(1);
 
-		if (does_match(L"!--"))
+		if (does_match("!--"))
 		{
 			skip_forward(3);
 
 			mark();
 
-			if (find(L"-->"))
+			if (find("-->"))
 			{
-				HtmlTag t(L"!");
-				t.attributes()[L"content"] = extract();
+				HtmlTag t("!");
+				t.attributes()["content"] = extract();
 				t.self_closed(true);
 
 				skip_forward(3);
@@ -409,7 +434,7 @@ namespace kotoparser
 			skip_forward(1);
 		}
 
-		wstring name = extract_word_block();
+		string name = extract_word_block();
 		if (is_null_or_whitespace(name))
 		{
 			return NULL;
@@ -434,20 +459,20 @@ namespace kotoparser
 		{
 			skip_whitespace();
 
-			if (does_match(L"/>"))
+			if (does_match("/>"))
 			{
 				tag->self_closed(true);
 				skip_forward(2);
 				return tag;
 			}
 
-			if (does_match(L">"))
+			if (does_match(">"))
 			{
 				skip_forward(1);
 				return tag;
 			}
 
-			wstring attribute_name = extract_word_block();
+			string attribute_name = extract_word_block();
 			if (is_null_or_whitespace(attribute_name))
 			{
 				return NULL;
@@ -464,11 +489,11 @@ namespace kotoparser
 				skip_forward(1);
 				skip_whitespace();
 
-				bool has_quote = does_match('"') || does_match(L"'");
+				bool has_quote = does_match('"') || does_match("'");
 
 				if (has_quote)
 				{
-					wchar_t quote = current();
+					char quote = current();
 
 					skip_forward(1);
 					mark();
@@ -500,7 +525,7 @@ namespace kotoparser
 			}
 			else
 			{
-				tag->attributes()[attribute_name] = L"";
+				tag->attributes()[attribute_name] = "";
 			}
 		}
 
@@ -553,6 +578,17 @@ namespace kotoparser
 						lines_type == BlockType::Paragraph ||
 						lines_type == BlockType::Blockquote ||
 						lines_type == BlockType::ListItem)
+					{
+						lines.push_back(block);
+						break;
+					}
+
+					add_integrated_block(result, lines);
+					lines.push_back(block);
+					break;
+
+				case BlockType::TableRow:
+					if (lines_type == BlockType::TableRow)
 					{
 						lines.push_back(block);
 						break;
@@ -632,11 +668,22 @@ namespace kotoparser
 			case BlockType::Paragraph:
 			{
 				shared_ptr<ParagraphBlock> p{ new ParagraphBlock(lines[0]->buffer()) };
-				p->start(lines[0]->start()).end(lines[lines.size() - 1]->end());;
+				p->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
 
 				lines.clear();
 
 				return p;
+			}
+
+			case BlockType::TableRow:
+			{
+				shared_ptr<TableBlock> table{ new TableBlock(lines[0]->buffer()) };
+				table->start(lines[0]->start()).end(lines[lines.size() - 1]->end());
+				table->children(lines);
+
+				lines.clear();
+
+				return table;
 			}
 
 			case BlockType::ListItem:

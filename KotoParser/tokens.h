@@ -20,13 +20,13 @@ namespace kotoparser
 		vector<shared_ptr<Token>>& children() { return _children; }
 		EmphasisToken& children(vector<shared_ptr<Token>>& new_children) { _children = new_children; return *this; }
 
-		EmphasisToken(wstring buffer, int start, int length, bool is_strong) : Token(buffer, start, length)
+		EmphasisToken(string buffer, int start, int length, bool is_strong) : Token(buffer, start, length)
 		{
 			_type = TokenType::Emphasis;
 			_is_strong = is_strong;
 		}
 
-		virtual wstring render();
+		virtual string render();
 
 	private:
 		bool _is_strong;
@@ -43,7 +43,7 @@ namespace kotoparser
 	class EmphasisParseToken : public Token
 	{
 	public:
-		EmphasisParseToken(wstring buffer, int start, int length, EmphasisType is_opening) : Token(buffer, start, length)
+		EmphasisParseToken(string buffer, int start, int length, EmphasisType is_opening) : Token(buffer, start, length)
 		{
 			switch (is_opening)
 			{
@@ -59,18 +59,18 @@ namespace kotoparser
 			}
 		}
 
-		virtual wstring render();
+		virtual string render();
 	};
 
 	class CodeToken : public Token
 	{
 	public: 
-		CodeToken(wstring buffer, int start, int length) : Token(buffer, start, length)
+		CodeToken(string buffer, int start, int length) : Token(buffer, start, length)
 		{
 			_type = TokenType::Code;
 		}
 
-		virtual wstring render();
+		virtual string render();
 	};
 
 	class HtmlToken : public Token
@@ -82,12 +82,12 @@ namespace kotoparser
 		vector<shared_ptr<Token>>& children() { return _children; }
 		HtmlToken& children(vector<shared_ptr<Token>>& new_children) { _children = new_children; return *this; }
 
-		HtmlToken(wstring buffer) : Token(buffer)
+		HtmlToken(string buffer) : Token(buffer)
 		{
 			_type = TokenType::Html;
 		}
 
-		virtual wstring render();
+		virtual string render();
 
 	private:
 		shared_ptr<HtmlTag> _tag;
@@ -97,16 +97,16 @@ namespace kotoparser
 	class LinkToken : public Token
 	{
 	public:
-		wstring text() const { return _text; }
-		LinkToken& text(wstring& new_text) { _text = new_text; return *this; }
+		string text() const { return _text; }
+		LinkToken& text(string& new_text) { _text = new_text; return *this; }
 
-		wstring url() const { return _url; }
-		LinkToken& url(wstring& new_url) { _text = new_url; return *this; }
+		string url() const { return _url; }
+		LinkToken& url(string& new_url) { _text = new_url; return *this; }
 
 		bool is_internal() const { return _is_internal; }
 		LinkToken& is_internal(bool new_is_internal) { _is_internal = new_is_internal; return *this; }
 
-		LinkToken(wstring buffer, int start, int length, wstring text, wstring url, bool is_internal) : Token(buffer, start, length)
+		LinkToken(string buffer, int start, int length, string text, string url, bool is_internal) : Token(buffer, start, length)
 		{
 			_type = TokenType::Link;
 			_text = text;
@@ -114,44 +114,44 @@ namespace kotoparser
 			_is_internal = is_internal;
 		}
 
-		virtual wstring render();
+		virtual string render();
 	private:
-		wstring _text;
-		wstring _url;
+		string _text;
+		string _url;
 		bool _is_internal;
 	};
 
 	class ImageToken : public Token
 	{
 	public:
-		wstring text() const { return _text; }
-		ImageToken& text(wstring& new_text) { _text = new_text; return *this; }
+		string text() const { return _text; }
+		ImageToken& text(string& new_text) { _text = new_text; return *this; }
 
-		wstring url() const { return _url; }
-		ImageToken& url(wstring& new_url) { _text = new_url; return *this; }
+		string url() const { return _url; }
+		ImageToken& url(string& new_url) { _text = new_url; return *this; }
 
-		ImageToken(wstring buffer, int start, int length, wstring text, wstring url) : Token(buffer, start, length)
+		ImageToken(string buffer, int start, int length, string text, string url) : Token(buffer, start, length)
 		{
 			_type = TokenType::Img;
 			_text = text;
 			_url = url;
 		}
 
-		virtual wstring render();
+		virtual string render();
 	private:
-		wstring _text;
-		wstring _url;
+		string _text;
+		string _url;
 	};
 
 	class TextToken : public Token
 	{
 	public:
-		TextToken(wstring buffer, int start, int length) : Token(buffer, start, length)
+		TextToken(string buffer, int start, int length) : Token(buffer, start, length)
 		{
 			_type = TokenType::Text;
 		}
 
-		virtual wstring render();
+		virtual string render();
 	};
 }
 

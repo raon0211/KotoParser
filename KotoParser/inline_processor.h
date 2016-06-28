@@ -8,7 +8,7 @@
 #include "token.h"
 #include "tokens.h"
 
-using std::wstring;
+using std::string;
 using std::shared_ptr;
 using std::array;
 
@@ -17,21 +17,21 @@ namespace kotoparser
 	class InlineProcessor : public StringScanner
 	{
 	public:
-		InlineProcessor(wstring input) : StringScanner(input)
+		InlineProcessor(string input) : StringScanner(input)
 		{
 		}
 
-		InlineProcessor(wstring input, int start, int length) : StringScanner(input, start, length)
+		InlineProcessor(string input, int start, int length) : StringScanner(input, start, length)
 		{
 		}
 
-		wstring transform();
+		string transform();
 		vector<shared_ptr<Token>> process();
 		
 	private:
 		vector<shared_ptr<Token>> parse();
 		shared_ptr<Token> make_emphasis_token();
-		bool is_emphasis_char(wchar_t c);
+		bool is_emphasis_char(char c);
 		shared_ptr<Token> make_code_token();
 		shared_ptr<Token> make_plain_token();
 		bool make_html_token(shared_ptr<HtmlToken> token);

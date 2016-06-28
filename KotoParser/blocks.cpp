@@ -3,45 +3,45 @@
 #include "utilities.h"
 #include "inline_processor.h"
 
-using std::wstring;
+using std::string;
 
 namespace kotoparser
 {
-	wstring HeadingBlock::render()
+	string HeadingBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<h" + std::to_wstring(_level) + L">";
+		result += "<h" + std::to_string(_level) + ">";
 		result += processor.transform();
-		result += L"</h" + std::to_wstring(_level) + L">";
+		result += "</h" + std::to_string(_level) + ">";
 
 		return result;
 	}
 
-	wstring BlockquoteBlock::render()
+	string BlockquoteBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<blockquote>";
+		result += "<blockquote>";
 		result += processor.transform();
-		result += L"</blockquote>";
+		result += "</blockquote>";
 
 		return result;
 	}
 
-	wstring CodeBlock::render()
+	string CodeBlock::render()
 	{
-		wstring result;
+		string result;
 
-		result += L"<pre>";
-		result += L"<code";
+		result += "<pre>";
+		result += "<code";
 		if (language().length() != 0)
 		{
-			result += L" class=\"" + language() + L"\"";
+			result += " class=\"" + language() + "\"";
 		}
-		result += L">";
+		result += ">";
 
 		for (auto line : children())
 		{
@@ -51,95 +51,177 @@ namespace kotoparser
 			result += '\n';
 		}
 		
-		result += L"</code>";
-		result += L"</pre>\n";
+		result += "</code>";
+		result += "</pre>\n";
 
 		return result;
 	}
 
-	wstring TermBlock::render()
+	string TermBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<dt>";
+		result += "<dt>";
 		result += processor.transform();
-		result += L"</dt>";
+		result += "</dt>";
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring DefinitionListBlock::render()
+	string DefinitionListBlock::render()
 	{
-		wstring result;
+		string result;
 
-		result += L"<dl>";
+		result += "<dl>";
 
 		for (auto child : children())
 		{
 			result += child->render();
 		}
 
-		result += L"</dl>";
-		result += L"\n";
+		result += "</dl>";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring DefinitionBlock::render()
+	string DefinitionBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<dd>";
+		result += "<dd>";
 		result += processor.transform();
-		result += L"</dd>";
+		result += "</dd>";
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring ListBlock::render()
+	string TableBlock::render()
 	{
-		wstring result;
+		string result;
+		
+		result += "<table>";
+		
+		for (auto row : children())
+		{
+			result += row->render();
+		}
+
+		result += "</table>";
+		result += "\n";
+
+		return result;
+	}
+
+	string TableRowBlock::render()
+	{
+		string result;
+
+		result += "<tr>";
+
+		for (auto row : children())
+		{
+			result += row->render();
+		}
+
+		result += "</tr>";
+		result += "\n";
+
+		return result;
+	}
+
+	string TableDataBlock::render()
+	{
+		string result;
+		string name = is_header() ? "th" : "td";
+		InlineProcessor processor(content());
+
+		result += "<";
+		result += name;
+		
+		result += " class=\"";
+		switch (alignment())
+		{
+			case TableDataAlignment::Left:
+				result += "left";
+				break;
+			case TableDataAlignment::Center:
+				result += "center";
+				break;
+			case TableDataAlignment::Right:
+				result += "right";
+				break;
+		}
+		result += "\"";
+
+		if (colspan() > 1)
+		{
+			result += " colspan=\"";
+			result += std::to_string(colspan());
+			result += "\"";
+		}
+
+		if (rowspan() > 1)
+		{
+			result += " rowspan=\"";
+			result += std::to_string(rowspan());
+			result += "\"";
+		}
+
+		result += ">";
+
+		result += processor.transform();
+
+		result += "</" + name + ">";
+		result += "\n";
+
+		return result;
+	}
+
+	string ListBlock::render()
+	{
+		string result;
 
 		if (children().size() > 0)
 		{
-			wstring name;
+			string name;
 			
 			if ((std::dynamic_pointer_cast<ListItemBlock>(children()[0])->is_ordered()) == true)
 			{
-				name = L"ol";
+				name = "ol";
 			}
 			else
 			{
-				name = L"ul";
+				name = "ul";
 			}
 
-			result += L"<" + name + L">";
+			result += "<" + name + ">";
 
 			for (auto child : children())
 			{
 				result += child->render();
 			}
 
-			result += L"</" + name + L">";
+			result += "</" + name + ">";
 
-			result += L"\n";
+			result += "\n";
 		}
 
 		return result;
 	}
 
-	wstring ListItemBlock::render()
+	string ListItemBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<li>";
+		result += "<li>";
 
 		result += processor.transform();
 
@@ -148,41 +230,41 @@ namespace kotoparser
 			result += child->render();
 		}
 
-		result += L"</li>";
+		result += "</li>";
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring ParagraphBlock::render()
+	string ParagraphBlock::render()
 	{
-		wstring result;
+		string result;
 		InlineProcessor processor(content());
 
-		result += L"<p>";
+		result += "<p>";
 		result += processor.transform();
-		result += L"</p>";
+		result += "</p>";
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring HtmlBlock::render()
+	string HtmlBlock::render()
 	{
-		wstring result;
+		string result;
 
-		wstring name = _wcslwr(&tag()->name()[0]);
+		string name = _strlwr(&tag()->name()[0]);
 
-		result += L"<";
+		result += "<";
 		result += name;
 
 		for (auto attribute : tag()->attributes())
 		{
-			result += L" ";
+			result += " ";
 			result += attribute.first;
-			result += L"=";
+			result += "=";
 			result += '"';
 			result += attribute.second;
 			result += '"';
@@ -191,34 +273,34 @@ namespace kotoparser
 		if (tag()->self_closed() ||
 			contains(tag()->types(), HtmlTagType::NoClosing))
 		{
-			result += L" />";
+			result += " />";
 		}
 		else
 		{
-			result += L">";
+			result += ">";
 
 			for (auto child : children())
 			{
 				result += child->render();
 			}
 
-			result += L"</";
+			result += "</";
 			result += name;
-			result += L">";
+			result += ">";
 		}
 
-		result += L"\n";
+		result += "\n";
 
 		return result;
 	}
 
-	wstring PlainBlock::render()
+	string PlainBlock::render()
 	{
 		return html_encode(content());
 	}
 
-	wstring BlankBlock::render()
+	string BlankBlock::render()
 	{
-		return L"";
+		return "";
 	}
 }

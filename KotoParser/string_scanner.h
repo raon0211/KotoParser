@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-using std::wstring;
+using std::string;
 using std::vector;
 
 #ifndef STRINGSCANNER_H
@@ -11,20 +11,20 @@ namespace kotoparser
 	class StringScanner
 	{
 	public:
-		wchar_t current();
+		char current();
 		bool char_is_first_of_line();
 		bool skipped_line_end();
 		bool at_file_start();
 		bool at_file_end();
 		bool at_line_end();
 
-		StringScanner(wstring input);
-		StringScanner(wstring input, int position, int length);
+		StringScanner(string input);
+		StringScanner(string input, int position, int length);
 
-		void reset(wstring input);
-		void reset(wstring input, int position, int length);
+		void reset(string input);
+		void reset(string input, int position, int length);
 
-		wchar_t char_at_offset(int offset);
+		char char_at_offset(int offset);
 		void skip_forward(int characters);
 		bool skip_whitespace();
 		int skip_linespace();
@@ -33,29 +33,29 @@ namespace kotoparser
 		void skip_to_next_line();
 		void skip_to_file_end();
 
-		bool does_match(wchar_t c);
-		bool does_match_any(vector<wchar_t> chars);
-		bool does_match(wstring str);
+		bool does_match(char c);
+		bool does_match_any(vector<char> chars);
+		bool does_match(string str);
 
-		bool find(wchar_t c);
-		bool find_any(vector<wchar_t> chars);
-		bool find(wstring str);
+		bool find(char c);
+		bool find_any(vector<char> chars);
+		bool find(string str);
 
-		wstring substring(int start);
-		wstring substring(int start, int length);
+		string substring(int start);
+		string substring(int start, int length);
 
 		void mark();
-		wstring extract();
-		wstring extract_word_block();
+		string extract();
+		string extract_word_block();
 	protected:
-		wstring input;
+		string input;
 		int start;
 		int end;
 		int position;
 		int mark_pos;
 	};
 
-	bool is_linespace(wchar_t c);
-	bool is_line_end(wchar_t c);
+	bool is_linespace(char c);
+	bool is_line_end(char c);
 }
 #endif

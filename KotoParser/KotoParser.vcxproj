@@ -117,6 +117,7 @@
     <ClInclude Include="html_tag.h" />
     <ClInclude Include="inline_processor.h" />
     <ClInclude Include="kotoparser.h" />
+    <ClInclude Include="table_processor.h" />
     <ClInclude Include="token.h" />
     <ClInclude Include="tokens.h" />
     <ClInclude Include="utilities.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="html_tag.cpp" />
     <ClCompile Include="inline_processor.cpp" />
     <ClCompile Include="kotoparser.cpp" />
+    <ClCompile Include="table_processor.cpp" />
     <ClCompile Include="token.cpp" />
     <ClCompile Include="tokens.cpp" />
     <ClCompile Include="utilities.cpp" />

@@ -2,11 +2,11 @@
 #include <string>
 #include "utilities.h"
 
-using std::wstring;
+using std::string;
 
 namespace kotoparser
 {
-	wstring Block::render()
+	string Block::render()
 	{
 		return html_encode(content());
 	}

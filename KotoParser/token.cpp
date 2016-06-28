@@ -3,7 +3,7 @@
 
 namespace kotoparser
 {
-	wstring Token::render()
+	string Token::render()
 	{
 		return html_encode(content());
 	}

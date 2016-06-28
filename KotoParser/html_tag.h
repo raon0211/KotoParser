@@ -6,7 +6,7 @@
 #include <vector>
 
 using std::map;
-using std::wstring;
+using std::string;
 using std::vector;
 
 namespace kotoparser
@@ -21,11 +21,11 @@ namespace kotoparser
 	class HtmlTag
 	{
 	public:
-		wstring name() const { return _name; }
-		HtmlTag& name(wstring new_name) { _name = new_name; return *this; }
+		string name() const { return _name; }
+		HtmlTag& name(string new_name) { _name = new_name; return *this; }
 
-		map<wstring, wstring>& attributes() { return _attributes; }
-		HtmlTag& attributes(map<wstring, wstring> new_attributes) { _attributes = new_attributes; return *this; }
+		map<string, string>& attributes() { return _attributes; }
+		HtmlTag& attributes(map<string, string> new_attributes) { _attributes = new_attributes; return *this; }
 
 		bool self_closed() const { return _self_closed; }
 		HtmlTag& self_closed(bool new_self_closed) { _self_closed = new_self_closed; return *this; }
@@ -36,19 +36,19 @@ namespace kotoparser
 		vector<HtmlTagType> types();
 		bool safe();
 
-		HtmlTag(wstring name)
+		HtmlTag(string name)
 		{
 			this->name(name);
 		}
 
 	private:
-		wstring _name;
-		map<wstring, wstring> _attributes;
+		string _name;
+		map<string, string> _attributes;
 		bool _self_closed;
 		bool _closing;
-		static vector<wstring> allowed_tags;
-		static map<wstring, vector<wstring>> allowed_attribute_map;
-		static map<wstring, vector<HtmlTagType>> tag_types_map;
+		static vector<string> allowed_tags;
+		static map<string, vector<string>> allowed_attribute_map;
+		static map<string, vector<HtmlTagType>> tag_types_map;
 	};
 }
 

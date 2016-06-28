@@ -6,7 +6,7 @@
 #include <memory>
 
 using std::vector;
-using std::wstring;
+using std::string;
 using std::shared_ptr;
 
 namespace kotoparser
@@ -17,7 +17,7 @@ namespace kotoparser
 		Heading,
 		Blockquote,
 		Code,
-		Table,
+		Table, TableRow, TableData,
 		Html,
 		List, ListItem,
 		DefinitionList, Term, Definition,
@@ -34,8 +34,8 @@ namespace kotoparser
 		vector<shared_ptr<Block>>& children() { return _children; }
 		Block& children(vector<shared_ptr<Block>> new_children) { _children = new_children; return *this; }
 
-		wstring buffer() const { return _buffer; }
-		Block& buffer(wstring new_buffer) { _buffer = new_buffer; return *this; }
+		string buffer() const { return _buffer; }
+		Block& buffer(string new_buffer) { _buffer = new_buffer; return *this; }
 
 		int start() const { return _start; }
 		Block& start(int new_start) { _start = new_start; return *this; }
@@ -46,22 +46,22 @@ namespace kotoparser
 		int length() const { return _length; }
 		Block& length(int new_length) { _length = new_length; return *this; }
 
-		wstring content() const 
+		string content() const 
 		{ 
 			return _buffer.substr(_start, _length);
 		};
 
-		Block(wstring buffer)
+		Block(string buffer)
 		{
 			_type = BlockType::Paragraph;
 			_buffer = buffer;
 		}
 
-		virtual wstring render();
+		virtual string render();
 	protected:
 		BlockType _type;
 		vector<shared_ptr<Block>> _children;
-		wstring _buffer;
+		string _buffer;
 		int _start;
 		int _length;
 	};
